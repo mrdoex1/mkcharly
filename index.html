@@ -67,8 +67,12 @@
         <img src="img/logo.jpeg" alt="Logo Cocinería de Charly" class="h-12 w-12 object-contain" />
       </div>
       <div class="flex-1 min-w-0">
-        <h1 id="restName" class="font-display font-800 text-2xl leading-none uppercase tracking-wide text-white truncate">Cocinería de Charly</h1>
-        <p id="dayNote" class="text-[13px] font-semibold text-brand-yellow truncate">¡Hoy: Lunes de cazuela! 🍲</p>
+        <h1 id="restName" class="font-display font-800 text-2xl leading-none uppercase tracking-wide text-white truncate">
+          <span class="inline-block h-6 w-32 bg-neutral-800 rounded animate-pulse"></span>
+        </h1>
+        <p id="dayNote" class="text-[13px] font-semibold text-brand-yellow truncate mt-1">
+          <span class="inline-block h-4 w-44 bg-neutral-800/60 rounded animate-pulse"></span>
+        </p>
       </div>
       <button id="btnAdmin" class="focus-ring shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-xl border border-brand-line text-neutral-400 hover:text-brand-yellow hover:border-brand-yellow/60 transition" aria-label="Acceso del garzón" title="Garzón / administración">🔒</button>
     </div>
@@ -240,7 +244,7 @@
     const DEFAULT_MENU = {
       restaurant: {
         name:    "Cocinería de Charly",
-        dayNote: "¡Hoy: Lunes de cazuela y lomo saltado! 🍲"
+        dayNote: ""
       },
       /* Inclusión general: entra SIEMPRE con cada menú (banner superior) */
       inclusiones: [
