@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="es-CL">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="description" content="Menú del día en tiempo real · Cocinería de Charly. Mira qué hay disponible antes de pedir." />
+  <title>Cocinería de Charly · Menú del Día</title>
+
+  <!-- ============================================================
+       FUENTES DE MARCA (Google Fonts)
+       display → Barlow Condensed (energética, parrilla)
+       body    → Manrope (legible, alto contraste)
+  ============================================================ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- ============================================================
+       TAILWIND (CDN) + PALETA DE MARCA
+       El logo usa ROJO #f02b2b y AMARILLO #ffcd05 sobre fondo negro.
+  ============================================================ -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              red:    "#f02b2b",
+              yellow: "#ffcd05",
+              black:  "#0a0a0a",
+              coal:   "#161616",
+              line:   "#2a2a2a",
+              good:   "#22c55e"
+            }
+          },
+          fontFamily: {
+            display: ['"Barlow Condensed"', 'sans-serif'],
+            body:    ['Manrope', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { -webkit-tap-highlight-color: transparent; }
+    ::selection { background: #ffcd05; color: #0a0a0a; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 999px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+  </style>
+</head>
+
+<body class="bg-brand-black text-neutral-100 font-body antialiased min-h-screen">
+
+  <!-- Degradado decorativo rojo en la parte superior (profundidad) -->
+  <div class="pointer-events-none fixed inset-x-0 top-0 h-72 bg-[radial-gradient(ellipse_at_top,rgba(240,43,43,0.16),transparent_70%)] z-0" aria-hidden="true"></div>
+
+  <!-- ============================================================
+       HEADER STICKY · Logo + nombre + acceso del garzón (🔒)
+  ============================================================ -->
+  <header class="sticky top-0 z-40 bg-brand-black/85 backdrop-blur-md border-b border-brand-line">
+    <div class="max-w-md mx-auto px-4 py-3 flex items-center gap-3">
+      <div class="h-14 w-14 shrink-0 rounded-2xl overflow-hidden ring-2 ring-brand-yellow/50 bg-brand-coal flex items-center justify-center">
+        <img src="img/logo.jpeg" alt="Logo Cocinería de Charly" class="h-12 w-12 object-contain" />
+      </div>
+      <div class="flex-1 min-w-0">
+        <h1 id="restName" class="font-display font-800 text-2xl leading-none uppercase tracking-wide text-white truncate">Cocinería de Charly</h1>
+        <p id="dayNote" class="text-[13px] font-semibold text-brand-yellow truncate">¡Hoy: Lunes de cazuela! 🍲</p>
+      </div>
+      <button id="btnAdmin" class="focus-ring shrink-0 inline-flex items-center justify-center h-10 w-10 rounded-xl border border-brand-line text-neutral-400 hover:text-brand-yellow hover:border-brand-yellow/60 transition" aria-label="Acceso del garzón" title="Garzón / administración">🔒</button>
+    </div>
+  </header>
+
+  <main class="relative z-10 max-w-md mx-auto px-4 pt-5 pb-28 space-y-5">
+
+    <!-- ============================================================
+         INCLUSIONES → banner destacado superior
+    ============================================================ -->
+    <section id="inclusionsBox" aria-label="Incluye siempre">
+      <div class="rounded-2xl p-4 bg-brand-coal border border-brand-line animate-pulse space-y-3">
+        <div class="h-4 bg-neutral-800 rounded w-1/3"></div>
+        <div class="h-5 bg-neutral-800 rounded w-3/4"></div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         ACOMPAÑAMIENTOS DISPONIBLES HOY (pool global, 1 sola vez)
+    ============================================================ -->
+    <section id="agregadosBox" aria-label="Acompañamientos del día">
+      <div class="rounded-2xl p-4 bg-brand-coal border border-brand-line animate-pulse space-y-3">
+        <div class="h-5 bg-neutral-800 rounded w-1/2"></div>
+        <div class="flex gap-2">
+          <div class="h-8 bg-neutral-800 rounded-full w-20"></div>
+          <div class="h-8 bg-neutral-800 rounded-full w-24"></div>
+          <div class="h-8 bg-neutral-800 rounded-full w-16"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         CATEGORÍAS (Menú Económico / Ejecutivo / Premium)
+    ============================================================ -->
+    <section id="categoriasBox" aria-label="Menú del día" class="space-y-4">
+      <div class="rounded-2xl bg-brand-coal border border-brand-line p-4 animate-pulse space-y-4">
+        <div class="flex justify-between items-center">
+          <div class="h-6 bg-neutral-800 rounded w-1/3"></div>
+          <div class="h-6 bg-neutral-800 rounded w-16"></div>
+        </div>
+        <div class="space-y-3">
+          <div class="h-16 bg-neutral-800/60 rounded-xl"></div>
+          <div class="h-16 bg-neutral-800/60 rounded-xl"></div>
+        </div>
+      </div>
+      <div class="rounded-2xl bg-brand-coal border border-brand-line p-4 animate-pulse space-y-4">
+        <div class="flex justify-between items-center">
+          <div class="h-6 bg-neutral-800 rounded w-1/3"></div>
+          <div class="h-6 bg-neutral-800 rounded w-16"></div>
+        </div>
+        <div class="space-y-3">
+          <div class="h-16 bg-neutral-800/60 rounded-xl"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       FOOTER FIJO · última actualización + botón de refresco
+  ============================================================ -->
+  <footer class="fixed bottom-0 inset-x-0 z-40 border-t border-brand-line bg-brand-black/90 backdrop-blur-md">
+    <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between gap-3 text-[12px]">
+      <div class="flex items-center gap-2 min-w-0 text-neutral-400">
+        <span class="relative flex h-2 w-2 shrink-0" aria-hidden="true">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-good opacity-60"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-good"></span>
+        </span>
+        <span class="truncate">Actualización: <span id="updatedAt" class="font-semibold text-neutral-200">--:--:--</span></span>
+      </div>
+      <button id="btnRefresh" class="focus-ring shrink-0 inline-flex items-center gap-1.5 font-semibold text-brand-yellow hover:text-black hover:bg-brand-yellow px-3 py-1.5 rounded-lg border border-brand-yellow/40 transition" aria-label="Actualizar menú">
+        <span aria-hidden="true">↻</span> Actualizar
+      </button>
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       MODAL · PIN de acceso del garzón
+  ============================================================ -->
+  <div id="pinModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+    <div class="w-full max-w-xs bg-brand-coal border border-brand-line rounded-3xl p-6 text-center shadow-2xl">
+      <h2 class="font-display font-800 text-2xl uppercase tracking-wide text-white">Acceso Garzón</h2>
+      <p class="text-sm text-neutral-400 mt-1">Ingresa el PIN de 4 dígitos</p>
+      <form id="pinForm" class="mt-4 space-y-3">
+        <input id="pinInput" type="password" inputmode="numeric" maxlength="4" pattern="[0-9]{4}" autocomplete="off"
+               class="w-full text-center text-3xl font-display tracking-[0.5em] bg-brand-black border border-brand-line rounded-xl py-3 text-brand-yellow focus:outline-none focus:border-brand-yellow transition"
+               placeholder="••••" aria-label="Ingresar PIN" />
+        <div id="pinError" class="hidden text-sm font-semibold text-brand-red">Código incorrecto, inténtalo de nuevo.</div>
+        <div class="flex gap-2">
+          <button type="button" id="pinCancel" class="flex-1 py-3 rounded-xl border border-brand-line text-neutral-300 font-semibold hover:bg-white/5 transition">Cancelar</button>
+          <button type="submit" class="flex-1 py-3 rounded-xl bg-brand-red text-white font-bold hover:bg-brand-red/85 transition">Entrar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL · CONFIRMACIÓN DE CAMBIOS (Cajera / Admin)
+  ============================================================ -->
+  <div id="confirmModal" style="z-index: 99999;" class="fixed inset-0 hidden items-center justify-center p-4 bg-black/85 backdrop-blur-sm">
+    <div class="w-full max-w-sm bg-brand-coal border border-brand-line rounded-3xl p-6 text-center shadow-2xl space-y-4">
+      <div class="text-4xl">⚠️</div>
+      <h3 id="confirmTitle" class="font-display font-800 text-2xl uppercase tracking-wide text-white">¿Confirmar modificación?</h3>
+      <p id="confirmDesc" class="text-sm text-neutral-300">¿Estás segura de realizar este cambio en el menú?</p>
+      <div class="flex gap-2 pt-2">
+        <button type="button" id="confirmCancel" class="flex-1 py-3 rounded-xl border border-brand-line text-neutral-300 font-semibold hover:bg-white/5 transition">Cancelar</button>
+        <button type="button" id="confirmOk" class="flex-1 py-3 rounded-xl bg-brand-yellow text-black font-bold hover:bg-brand-yellow/90 transition">Sí, confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       MODAL · PANEL DE CONTROL (garzón)
+  ============================================================ -->
+  <div id="adminModal" class="fixed inset-0 z-50 hidden flex-col bg-brand-black/95">
+    <div class="max-w-md w-full mx-auto h-full flex flex-col">
+      <div class="flex items-center justify-between px-4 py-3 border-b border-brand-line">
+        <div class="min-w-0">
+          <h2 class="font-display font-800 text-xl uppercase tracking-wide text-brand-yellow">Panel de Control</h2>
+          <p class="text-[12px] text-neutral-400 truncate">Marcá lo que se agota: se refleja al instante.</p>
+        </div>
+        <button id="adminClose" class="h-10 w-10 rounded-xl border border-brand-line text-neutral-300 hover:bg-white/5 transition" aria-label="Cerrar panel">✕</button>
+      </div>
+
+      <div id="adminBody" class="flex-1 overflow-y-auto px-4 py-4 space-y-6"></div>
+
+      <div class="px-4 py-3 border-t border-brand-line flex items-center justify-between gap-2">
+        <button id="adminReset" class="text-[12px] font-semibold text-neutral-400 hover:text-brand-red underline underline-offset-2 transition">Reiniciar menú</button>
+        <button id="adminLogout" class="text-[12px] font-semibold text-brand-yellow hover:text-black hover:bg-brand-yellow px-3 py-2 rounded-lg border border-brand-yellow/40 transition">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       JAVASCRIPT · LÓGICA DE LA APLICACIÓN
+       ─────────────────────────────────────────────────────────
+       Secciones:
+         1) CONFIG
+         2) DEFAULT_MENU
+         3) DATA LAYER   (fetchData / saveState → futuro Google Sheets)
+         4) STATE
+         5) HELPERS
+         6) RENDER
+         7) ADMIN PANEL
+         8) SYNC         (BroadcastChannel + polling)
+         9) EVENTS
+        10) INIT
+  ============================================================ -->
+  <script>
+    "use strict";
+
+    /* ===================== 1) CONFIG ===================== */
+    const CONFIG = {
+      storeKey:    "mkcharly_menu_v2",   // clave en localStorage (v2 sin bebidas)
+      channelName: "mkcharly_menu_sync", // canal BroadcastChannel entre pestañas
+      adminPin:    "1234",               // ⚠️ CAMBIA ESTE PIN
+      pollMs:      25000,                // polling suave (25 s)
+      // ─── FUTURO GOOGLE SHEETS / JSON PÚBLICO ───
+      // Al activar esto, la app lee el menú desde esa URL y el polling
+      // sincroniza TODOS los celulares. Debe devolver la MISMA estructura
+      // JSON que DEFAULT_MENU. Ejemplo:
+      // dataUrl: "https://script.google.com/macros/s/AYFW.../exec",
+      dataUrl: "https://script.google.com/macros/s/AKfycbz5of1w6DmvaTZJcAz0SSK356zOqbcpoDnNXgyQHXBLSbJndg9uxai9-u8CsICmgBqrUA/exec",
+    };
+
+    /* ===================== 2) DEFAULT_MENU ===================== */
+    /* Estructura de datos de referencia (día 1, 100% local).
+       Los campos `available` (= true/false) son el interruptor de agotado. */
+    const DEFAULT_MENU = {
+      restaurant: {
+        name:    "Cocinería de Charly",
+        dayNote: "¡Hoy: Lunes de cazuela y lomo saltado! 🍲"
+      },
+      /* Inclusión general: entra SIEMPRE con cada menú (banner superior) */
+      inclusiones: [
+        { id: "inc_ensalada", texto: "Ensalada mixta de entrada", emoji: "🥗" },
+        { id: "inc_bebida",   texto: "Bebida gratis",             emoji: "🥤" }
+      ],
+
+      /* Máximo de agregados que se pueden elegir por plato */
+      maxAgregados: 2,
+
+      /* Acompañamientos GLOBALES: compartidos por todos los platos
+         "con agregado". Si uno se agota → desaparece en TODOS. */
+      agregados: [
+        { id: "agr_pure",      nombre: "Puré",        available: true },
+        { id: "agr_fritas",    nombre: "Papas fritas",available: true },
+        { id: "agr_fideos",    nombre: "Fideos",      available: true },
+        { id: "agr_papasmayo", nombre: "Papas mayo",  available: true },
+        { id: "agr_arroz",     nombre: "Arroz",       available: true }
+      ],
+
+      /* Categorías = niveles de menú con precio.
+         tipo de plato: "con_agregado" (muestra la lista de agregados)
+                        "cerrado"      (preparación cerrada del día) */
+      categories: [
+        {
+          id: "cat_economico", nombre: "Menú Económico", precio: 4800, icono: "🥘",
+          platos: [
+            { id: "pla_mechada", nombre: "Carne mechada",   desc: "Jugosa y dorada al horno", tipo: "con_agregado", available: true },
+            { id: "pla_pollo",   nombre: "Pollo al horno",  desc: "Condimentado con paprika", tipo: "con_agregado", available: true },
+            { id: "pla_porotos", nombre: "Porotos con riendas", desc: "Clásico casero, preparación cerrada", tipo: "cerrado", available: true }
+          ]
+        },
+        {
+          id: "cat_ejecutivo", nombre: "Menú Ejecutivo", precio: 5800, icono: "🍽️",
+          platos: [
+            { id: "pla_salmon",   nombre: "Salmón a la plancha", desc: "Al limón y finas hierbas", tipo: "con_agregado", available: true },
+            { id: "pla_milanesa", nombre: "Milanesa de pollo",   desc: "Crujiente empanizado",     tipo: "con_agregado", available: true },
+            { id: "pla_bistec",   nombre: "Bistec a lo pobre",   desc: "Preparación cerrada: bistec + papas + huevo", tipo: "cerrado", available: true }
+          ]
+        },
+        {
+          id: "cat_premium", nombre: "Menú Premium", precio: 7500, icono: "✨",
+          platos: [
+            { id: "pla_lomo",    nombre: "Lomo saltado",    desc: "Lomo tierno salteado con cebolla, tomate y ají", tipo: "cerrado", available: true },
+            { id: "pla_lomopobre", nombre: "Lomo a lo pobre", desc: "El clásico chileno, preparación cerrada",      tipo: "cerrado", available: true }
+          ]
+        }
+      ],
+    };
+
+    /* ===================== 3) DATA LAYER =====================
+       ÚNICA puerta de acceso a los datos. Hoy lee localStorage;
+       mañana, al activar CONFIG.dataUrl, leerá Google Sheets / JSON.
+       La interfaz (render) NO cambia: solo se toca esta capa. */
+    function normalizeMenu(d) {
+      const base = structuredClone(DEFAULT_MENU);
+      if (!d || typeof d !== "object") return base;
+      const out = {
+        restaurant: { ...base.restaurant, ...(d.restaurant || {}) },
+        inclusiones: Array.isArray(d.inclusiones) ? d.inclusiones : base.inclusiones,
+        maxAgregados: typeof d.maxAgregados === "number" ? d.maxAgregados : base.maxAgregados,
+        agregados: Array.isArray(d.agregados) ? d.agregados : base.agregados,
+        categories: Array.isArray(d.categories) ? d.categories : base.categories,
+      };
+      return out;
+    }
+
+    async function fetchData() {
+      // 1) Si hay fuente remota (Google Sheets / JSON público) configurada…
+      if (CONFIG.dataUrl) {
+        try {
+          const res = await fetch(CONFIG.dataUrl, { cache: "no-store" });
+          if (!res.ok) throw new Error("HTTP " + res.status);
+          return normalizeMenu(await res.json());
+        } catch (err) {
+          console.warn("Fuente remota no disponible, uso datos locales:", err);
+        }
+      }
+      // 2) Fallback: estado guardado por el garzón (localStorage)
+      const raw = localStorage.getItem(CONFIG.storeKey);
+      if (raw) {
+        try { return normalizeMenu(JSON.parse(raw)); }
+        catch (err) { console.warn("JSON local corrupto, uso valores por defecto."); }
+      }
+      // 3) Sin nada guardado → menú por defecto
+      return structuredClone(DEFAULT_MENU);
+    }
+
+    function saveState() {
+      localStorage.setItem(CONFIG.storeKey, JSON.stringify(state.menu));
+      if (CONFIG.dataUrl) {
+        fetch(CONFIG.dataUrl, {
+          method: "POST",
+          body: JSON.stringify({ action: "guardar", pin: CONFIG.adminPin, menu: state.menu })
+        }).catch(err => console.warn("Error al guardar en Google Sheets:", err));
+      }
+    }
+
+    /* ===================== 4) STATE ===================== */
+    const state = {
+      menu: null,          // menú actual (cargado en init)
+      adminUnlocked: false // sesión de garzón activa en esta pestaña
+    };
+
+    /* ===================== 5) HELPERS ===================== */
+    const $ = (sel) => document.querySelector(sel);
+    const money = (n) => "$" + Number(n).toLocaleString("es-CL");
+    /* Clases de estado: verde = disponible · opaco/tachado = agotado */
+    const plateOn  = "bg-brand-coal border-brand-line";
+    const plateOff = "bg-brand-coal/40 border-brand-line/60 opacity-50 grayscale";
+    const dotOn    = "bg-brand-good ring-brand-good/30";
+    const dotOff   = "bg-brand-red ring-brand-red/30";
+
+    /* ===================== 6) RENDER =====================
+       Dibuja TODA la vista de solo-lectura desde state.menu.
+       Se re-llama al cambiar algo → actualización sin recarga. */
+    function render() {
+      const m = state.menu;
+      if (!m) return;
+
+      document.title = m.restaurant.name + " · Menú del Día";
+      $("#restName").textContent = m.restaurant.name;
+      $("#dayNote").textContent = m.restaurant.dayNote || "";
+
+      // ---- Banner de inclusiones ----
+      $("#inclusionsBox").innerHTML = `
+        <div class="rounded-2xl overflow-hidden border border-brand-yellow/40 bg-gradient-to-br from-brand-red/30 via-brand-coal to-brand-coal">
+          <div class="px-4 py-2.5 border-b border-brand-yellow/20 flex items-center gap-2">
+            <span class="font-display font-700 uppercase tracking-widest text-brand-yellow text-sm">Incluye siempre</span>
+            <svg class="w-4 h-4 text-brand-yellow" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 111.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z" clip-rule="evenodd"/></svg>
+          </div>
+          <ul class="px-4 py-3 space-y-2">
+            ${m.inclusiones.map(i => `
+              <li class="flex items-center gap-3">
+                <span class="text-xl" aria-hidden="true">${i.emoji || "✔"}</span>
+                <span class="font-semibold text-neutral-100">${i.texto}</span>
+                <span class="ml-auto text-[11px] font-bold text-brand-yellow px-2 py-0.5 rounded-full bg-brand-yellow/15 shrink-0">Incluido</span>
+              </li>`).join("")}
+          </ul>
+        </div>`;
+
+      // ---- Acompañamientos del día (pool global) ----
+      const onAg = m.agregados.filter(a => a.available);
+      $("#agregadosBox").innerHTML = `
+        <div class="rounded-2xl bg-brand-coal border border-brand-line p-4">
+          <div class="flex items-end justify-between mb-3">
+            <h3 class="font-display font-700 text-2xl uppercase tracking-wide text-white">Acompañamientos</h3>
+            <span class="text-[11px] font-bold text-neutral-300 bg-white/5 px-2 py-1 rounded-full">Elige hasta ${m.maxAgregados}</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            ${m.agregados.map(a => `
+              <span class="inline-flex items-center gap-1.5 text-[13px] font-semibold px-3 py-1.5 rounded-full border transition ${a.available
+                  ? "bg-brand-good/10 text-brand-good border-brand-good/40"
+                  : "bg-transparent text-neutral-500 border-brand-line line-through opacity-70"}">
+                <span class="w-1.5 h-1.5 rounded-full ${a.available ? "bg-brand-good" : "bg-neutral-600"}" aria-hidden="true"></span>
+                ${a.nombre}${a.available ? "" : " · Agotado"}
+              </span>`).join("")}
+          </div>
+          ${onAg.length < m.agregados.length
+            ? `<p class="mt-3 text-[12px] font-semibold text-brand-red">Solo quedan <span class="font-bold">${onAg.length}</span> de ${m.agregados.length} acompañamientos hoy.</p>`
+            : ""}
+        </div>`;
+
+      // ---- Categorías + platos ----
+      $("#categoriasBox").innerHTML = m.categories.map(cat => {
+        const nAgotados = cat.platos.filter(p => !p.available).length;
+        return `
+          <div class="rounded-2xl bg-brand-coal border border-brand-line overflow-hidden">
+            <div class="flex items-center justify-between gap-3 px-4 py-3 border-b border-brand-line/70 bg-gradient-to-r from-brand-red/20 to-transparent">
+              <div class="flex items-center gap-2.5 min-w-0">
+                <span class="text-2xl" aria-hidden="true">${cat.icono || "🍽️"}</span>
+                <h3 class="font-display font-800 text-2xl uppercase tracking-wide text-white truncate">${cat.nombre}</h3>
+              </div>
+              <div class="shrink-0 text-right">
+                <div class="font-display font-700 text-xl leading-none text-brand-yellow">${money(cat.precio)}</div>
+                <div class="text-[10px] uppercase tracking-widest text-neutral-400">menú completo</div>
+              </div>
+            </div>
+            <ul class="divide-y divide-brand-line/70">
+              ${cat.platos.map(p => plateCard(p)).join("")}
+            </ul>
+            ${nAgotados ? `<p class="px-4 py-2 text-[11px] font-semibold text-neutral-400 bg-white/[0.02]">${nAgotados} opción(es) agotada(s)</p>` : ""}
+          </div>`;
+      }).join("");
+    }
+
+    /* Tarjeta de un plato individual (según su tipo) */
+    function plateCard(p) {
+      const on = p.available;
+      const badge = p.tipo === "con_agregado"
+        ? `<span class="inline-flex items-center text-[10px] font-bold uppercase tracking-wide text-brand-yellow border border-brand-yellow/50 rounded-full px-2 py-0.5">+${state.menu.maxAgregados} Agregados</span>`
+        : `<span class="inline-flex items-center text-[10px] font-bold uppercase tracking-wide text-neutral-300 border border-neutral-500/60 rounded-full px-2 py-0.5">Plato Preparado</span>`;
+
+      // Los platos "con agregado" muestran la lista de acompañamientos disponibles
+      const agregadosHtml = p.tipo === "con_agregado" ? `
+        <div class="mt-2.5 pt-2.5 border-t border-dashed border-brand-line">
+          <p class="text-[11px] uppercase tracking-widest text-neutral-400 mb-1.5">Acompañamientos del plato</p>
+          <div class="flex flex-wrap gap-1.5">
+            ${state.menu.agregados.map(a => `
+              <span class="text-[12px] font-semibold px-2 py-0.5 rounded-md border ${a.available
+                  ? "bg-brand-good/10 text-brand-good border-brand-good/30"
+                  : "bg-transparent text-neutral-600 line-through border-brand-line opacity-60"}">
+                ${a.nombre}${a.available ? "" : " · Agotado"}
+              </span>`).join("")}
+          </div>
+        </div>` : "";
+
+      return `
+        <li class="p-4 ${on ? plateOn : plateOff} transition">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="inline-block w-2.5 h-2.5 rounded-full ring-4 ${on ? dotOn : dotOff}" aria-hidden="true"></span>
+                <span class="font-display font-700 text-xl leading-tight ${on ? "text-white" : "text-neutral-400"}">${p.nombre}</span>
+                ${badge}
+              </div>
+              ${p.desc ? `<p class="mt-1 text-[13px] text-neutral-400">${p.desc}</p>` : ""}
+            </div>
+            ${on ? "" : `<span class="shrink-0 text-[11px] font-bold uppercase tracking-wide text-brand-red border border-brand-red/60 rounded-full px-2 py-1">Agotado</span>`}
+          </div>
+          ${on ? agregadosHtml : ""}
+        </li>`;
+    }
+
+    /* ===================== CONFIRMATION MODAL HELPER ===================== */
+    function askConfirm(title, desc, onYes) {
+      const modal = $("#confirmModal");
+      $("#confirmTitle").textContent = title;
+      $("#confirmDesc").textContent = desc;
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+
+      const btnOk = $("#confirmOk");
+      const btnCancel = $("#confirmCancel");
+
+      const newOk = btnOk.cloneNode(true);
+      const newCancel = btnCancel.cloneNode(true);
+      btnOk.parentNode.replaceChild(newOk, btnOk);
+      btnCancel.parentNode.replaceChild(newCancel, btnCancel);
+
+      $("#confirmOk").addEventListener("click", () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        onYes();
+      });
+
+      const closeM = () => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+      };
+      $("#confirmCancel").addEventListener("click", closeM);
+      modal.addEventListener("click", (e) => { if (e.target === modal) closeM(); });
+    }
+
+    /* ===================== 7) ADMIN PANEL & CRUD ===================== */
+    function renderAdmin() {
+      const m = state.menu;
+      let html = "";
+
+      // 1. ANUNCIO DEL DÍA / BANNER
+      html += `
+        <div class="bg-brand-black/60 p-4 rounded-2xl border border-brand-line space-y-3">
+          <h4 class="font-display font-700 text-base uppercase tracking-wide text-brand-yellow">📢 Anuncio del Día (Banner superior)</h4>
+          <input id="adminDayNoteInput" type="text" value="${m.restaurant.dayNote || ''}" placeholder="Ej: ¡Hoy Lunes de Cazuela!" class="w-full bg-brand-coal border border-brand-line rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-yellow" />
+          <button type="button" onclick="adminSaveDayNote()" class="w-full py-2.5 rounded-xl bg-brand-yellow text-black font-bold text-sm hover:bg-brand-yellow/90 transition">Actualizar Anuncio</button>
+        </div>`;
+
+      // 2. GESTIÓN DE PLATOS POR CATEGORÍA
+      m.categories.forEach(cat => {
+        html += `
+          <div class="bg-brand-black/60 p-4 rounded-2xl border border-brand-line space-y-3">
+            <div class="flex items-center justify-between gap-2">
+              <h4 class="font-display font-700 text-lg uppercase tracking-wide text-white">${cat.icono} ${cat.nombre}</h4>
+              <div class="flex items-center gap-1.5">
+                <input id="price_${cat.id}" type="number" value="${cat.precio}" class="w-24 bg-brand-coal border border-brand-line rounded-lg px-2 py-1 text-sm text-brand-yellow font-bold text-center focus:outline-none focus:border-brand-yellow" />
+                <button type="button" onclick="adminUpdatePrice('${cat.id}')" class="px-2.5 py-1.5 rounded-lg bg-white/10 text-xs font-semibold text-neutral-200 hover:bg-white/20 transition">Cambiar Precio</button>
+              </div>
+            </div>
+
+            <!-- Lista de platos -->
+            <div class="space-y-2">
+              ${cat.platos.map(p => `
+                <div class="flex items-center justify-between gap-2 p-2.5 bg-brand-coal rounded-xl border border-brand-line/60">
+                  <div class="min-w-0 pr-2">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-bold ${p.available ? 'text-brand-good' : 'text-brand-red'}">${p.available ? '🟢 Disponible' : '🔴 Agotado'}</span>
+                      <span class="text-sm font-semibold text-white truncate">${p.nombre}</span>
+                    </div>
+                    <p class="text-[11px] text-neutral-400 truncate">${p.desc || (p.tipo==='con_agregado'?'Con agregados':'Preparación cerrada')}</p>
+                  </div>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <button type="button" onclick="adminTogglePlate('${cat.id}','${p.id}')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${p.available ? 'bg-brand-good/20 text-brand-good border border-brand-good/40 hover:bg-brand-good/30' : 'bg-brand-red/20 text-brand-red border border-brand-red/40 hover:bg-brand-red/30'}">
+                      ${p.available ? '🟢 Encendido' : '🔴 Apagado'}
+                    </button>
+                    <button type="button" onclick="adminDeletePlate('${cat.id}','${p.id}')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition" title="Eliminar plato">🗑️</button>
+                  </div>
+                </div>`).join("")}
+            </div>
+
+            <!-- Formulario agregar plato a esta categoría -->
+            <div class="pt-3 border-t border-brand-line/40 space-y-2">
+              <p class="text-[11px] font-bold text-neutral-400 uppercase tracking-wide">➕ Agregar plato a ${cat.nombre}</p>
+              <input id="new_plate_name_${cat.id}" type="text" placeholder="Nombre del plato (ej: Lomo a lo pobre)" class="w-full bg-brand-coal border border-brand-line rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-yellow" />
+              <input id="new_plate_desc_${cat.id}" type="text" placeholder="Descripción breve" class="w-full bg-brand-coal border border-brand-line rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-yellow" />
+              <div class="flex items-center gap-2">
+                <select id="new_plate_type_${cat.id}" class="flex-1 bg-brand-coal border border-brand-line rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-yellow">
+                  <option value="con_agregado">Con Acompañamiento (Hasta 2)</option>
+                  <option value="cerrado">Preparación Cerrada (Sin agregados)</option>
+                </select>
+                <button type="button" onclick="adminAddPlate('${cat.id}')" class="px-4 py-2 rounded-xl bg-brand-good text-black font-bold text-xs hover:bg-brand-good/90 transition">Agregar</button>
+              </div>
+            </div>
+          </div>`;
+      });
+
+      // 3. GESTIÓN DE ACOMPAÑAMIENTOS GLOBALES
+      html += `
+        <div class="bg-brand-black/60 p-4 rounded-2xl border border-brand-line space-y-3">
+          <h4 class="font-display font-700 text-lg uppercase tracking-wide text-brand-yellow">🥗 Acompañamientos Globales</h4>
+          <div class="space-y-2">
+            ${m.agregados.map(a => `
+              <div class="flex items-center justify-between gap-2 p-2.5 bg-brand-coal rounded-xl border border-brand-line/60">
+                <div class="flex items-center gap-2 min-w-0 pr-2">
+                  <span class="text-xs font-bold ${a.available ? 'text-brand-good' : 'text-brand-red'}">${a.available ? '🟢' : '🔴'}</span>
+                  <span class="text-sm font-semibold text-white truncate">${a.nombre}</span>
+                </div>
+                <div class="flex items-center gap-1.5 shrink-0">
+                  <button type="button" onclick="adminToggleAgregado('${a.id}')" class="px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${a.available ? 'bg-brand-good/20 text-brand-good border border-brand-good/40 hover:bg-brand-good/30' : 'bg-brand-red/20 text-brand-red border border-brand-red/40 hover:bg-brand-red/30'}">
+                    ${a.available ? '🟢 Encendido' : '🔴 Apagado'}
+                  </button>
+                  <button type="button" onclick="adminDeleteAgregado('${a.id}')" class="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition" title="Eliminar acompañamiento">🗑️</button>
+                </div>
+              </div>`).join("")}
+          </div>
+
+          <div class="pt-3 border-t border-brand-line/40 flex items-center gap-2">
+            <input id="new_agregado_name" type="text" placeholder="Nuevo acompañamiento (ej: Choclo)" class="flex-1 bg-brand-coal border border-brand-line rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-yellow" />
+            <button type="button" onclick="adminAddAgregado()" class="px-4 py-2 rounded-xl bg-brand-good text-black font-bold text-xs hover:bg-brand-good/90 transition">➕ Agregar</button>
+          </div>
+        </div>`;
+
+      $("#adminBody").innerHTML = html;
+    }
+
+    /* ===================== CRUD HANDLERS CON MODAL DE CONFIRMACIÓN ===================== */
+    function adminSaveDayNote() {
+      const val = $("#adminDayNoteInput").value.trim();
+      askConfirm("Actualizar Anuncio", `¿Estás segura de cambiar la nota del banner por: "${val}"?`, () => {
+        state.menu.restaurant.dayNote = val;
+        commitChange();
+      });
+    }
+
+    function adminUpdatePrice(catId) {
+      const input = $(`#price_${catId}`);
+      const newPrice = Number(input.value);
+      const cat = state.menu.categories.find(c => c.id === catId);
+      if (!cat || isNaN(newPrice)) return;
+      askConfirm("Actualizar Precio", `¿Estás segura de cambiar el precio de "${cat.nombre}" a ${money(newPrice)}?`, () => {
+        cat.precio = newPrice;
+        commitChange();
+      });
+    }
+
+    function adminTogglePlate(catId, plateId) {
+      const plate = state.menu.categories.find(c => c.id === catId)?.platos.find(p => p.id === plateId);
+      if (!plate) return;
+      const nextState = !plate.available;
+      askConfirm("Cambiar Disponibilidad", `¿Estás segura de marcar el plato "${plate.nombre}" como ${nextState ? 'DISPONIBLE 🟢' : 'AGOTADO 🔴'}?`, () => {
+        plate.available = nextState;
+        commitChange();
+      });
+    }
+
+    function adminAddPlate(catId) {
+      const nameInput = $(`#new_plate_name_${catId}`);
+      const descInput = $(`#new_plate_desc_${catId}`);
+      const typeSelect = $(`#new_plate_type_${catId}`);
+      const name = nameInput.value.trim();
+      const desc = descInput.value.trim();
+      const tipo = typeSelect.value;
+      const cat = state.menu.categories.find(c => c.id === catId);
+      if (!name || !cat) return;
+
+      askConfirm("Agregar Plato", `¿Estás segura de agregar el plato "${name}" a ${cat.nombre}?`, () => {
+        const id = "pla_" + name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"_");
+        cat.platos.push({ id, nombre: name, desc, tipo, available: true });
+        commitChange();
+      });
+    }
+
+    function adminDeletePlate(catId, plateId) {
+      const cat = state.menu.categories.find(c => c.id === catId);
+      if (!cat) return;
+      const plate = cat.platos.find(p => p.id === plateId);
+      if (!plate) return;
+
+      askConfirm("Eliminar Plato", `⚠️ ¿Estás segura de ELIMINAR permanentemente el plato "${plate.nombre}" de ${cat.nombre}?`, () => {
+        cat.platos = cat.platos.filter(p => p.id !== plateId);
+        commitChange();
+      });
+    }
+
+    function adminToggleAgregado(id) {
+      const a = state.menu.agregados.find(x => x.id === id);
+      if (!a) return;
+      const nextState = !a.available;
+      askConfirm("Cambiar Acompañamiento", `¿Estás segura de marcar el acompañamiento "${a.nombre}" como ${nextState ? 'DISPONIBLE 🟢' : 'AGOTADO 🔴'} para todos los platos?`, () => {
+        a.available = nextState;
+        commitChange();
+      });
+    }
+
+    function adminAddAgregado() {
+      const input = $("#new_agregado_name");
+      const name = input.value.trim();
+      if (!name) return;
+
+      askConfirm("Agregar Acompañamiento", `¿Estás segura de agregar "${name}" a la lista global de acompañamientos?`, () => {
+        const id = "agr_" + name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"_");
+        state.menu.agregados.push({ id, nombre: name, available: true });
+        commitChange();
+      });
+    }
+
+    function adminDeleteAgregado(id) {
+      const a = state.menu.agregados.find(x => x.id === id);
+      if (!a) return;
+
+      askConfirm("Eliminar Acompañamiento", `⚠️ ¿Estás segura de ELIMINAR permanentemente el acompañamiento "${a.nombre}" de la lista global?`, () => {
+        state.menu.agregados = state.menu.agregados.filter(x => x.id !== id);
+        commitChange();
+      });
+    }
+
+    /* Committ de un cambio: persistir + redibujar vista, panel y sello de hora */
+    function commitChange() {
+      saveState();     // 1) persistir en el dispositivo del garzón/cajera
+      render();        // 2) refresco instantáneo de la vista cliente
+      renderAdmin();   // 3) sincronizar los paneles
+      updateTimestamp(); // 4) sello de hora
+      notifyUpdate();  // 5) avisar a otras pestañas del mismo navegador
+    }
+
+    function updateTimestamp() {
+      $("#updatedAt").textContent = new Date().toLocaleTimeString("es-CL", { hour12: false });
+    }
+
+    /* ===================== 8) SYNC =====================
+       Mantiene la vista al día sin recargas:
+       a) BroadcastChannel  → pestañas del MISMO navegador (instantáneo)
+       b) evento 'storage'  → respaldo entre pestañas
+       c) polling suave     → futuros OTROS dispositivos (cuando exista dataUrl) */
+    function setupSync() {
+      // a) Canal entre pestañas del mismo navegador
+      let bc = null;
+      try {
+        bc = new BroadcastChannel(CONFIG.channelName);
+        bc.onmessage = (e) => { if (e.data && e.data === "menu_updated") reloadFromSource(); };
+      } catch (err) { console.warn("BroadcastChannel no disponible:", err); }
+
+      // b) Respuesta al evento 'storage' nativo (disparado en OTRA pestaña)
+      window.addEventListener("storage", (e) => { if (e.key === CONFIG.storeKey) reloadFromSource(); });
+
+      // c) Polling suave: re-verifica la fuente. Hoy localStorage, mañana Google Sheets.
+      setInterval(() => { reloadFromSource(); }, CONFIG.pollMs);
+    }
+
+    function notifyUpdate() {
+      try {
+        const bc = new BroadcastChannel(CONFIG.channelName);
+        bc.postMessage("menu_updated");
+        setTimeout(() => bc.close(), 0);
+      } catch (err) { /* sin canal disponible */ }
+    }
+
+    /* Re-lee la fuente y re-render SOLO si cambió (evita parpadeos) */
+    async function reloadFromSource() {
+      const prev = JSON.stringify(state.menu);
+      const fresh = await fetchData();
+      if (JSON.stringify(fresh) !== prev) {
+        state.menu = fresh;
+        render();
+        updateTimestamp();
+      }
+    }
+
+    /* ===================== 9) EVENTS ===================== */
+    function bindEvents() {
+      const pinModal = $("#pinModal");
+      const adminModal = $("#adminModal");
+
+      // Acceso al panel: si ya hay sesión abre directo, si no pide PIN
+      $("#btnAdmin").addEventListener("click", () => {
+        state.adminUnlocked ? openAdmin() : openPin();
+      });
+
+      // --- PIN modal ---
+      function openPin() {
+        $("#pinInput").value = "";
+        $("#pinError").classList.add("hidden");
+        pinModal.classList.remove("hidden");
+        pinModal.classList.add("flex");
+        setTimeout(() => $("#pinInput").focus(), 60);
+      }
+      function closePin() {
+        pinModal.classList.add("hidden");
+        pinModal.classList.remove("flex");
+      }
+      $("#pinCancel").addEventListener("click", closePin);
+      pinModal.addEventListener("click", (e) => { if (e.target === pinModal) closePin(); });
+      $("#pinForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        if ($("#pinInput").value === CONFIG.adminPin) {
+          state.adminUnlocked = true;
+          closePin();
+          openAdmin();
+        } else {
+          $("#pinError").classList.remove("hidden");
+          $("#pinInput").value = "";
+          $("#pinInput").focus();
+        }
+      });
+
+      // --- Admin modal ---
+      function openAdmin() {
+        renderAdmin();
+        adminModal.classList.remove("hidden");
+        adminModal.classList.add("flex");
+      }
+      function closeAdmin() {
+        adminModal.classList.add("hidden");
+        adminModal.classList.remove("flex");
+      }
+      $("#adminClose").addEventListener("click", closeAdmin);
+      adminModal.addEventListener("click", (e) => { if (e.target === adminModal) closeAdmin(); });
+      $("#adminLogout").addEventListener("click", () => { state.adminUnlocked = false; closeAdmin(); });
+      $("#adminReset").addEventListener("click", () => { resetMenu(); });
+
+      // Refresco manual del cliente
+      $("#btnRefresh").addEventListener("click", async () => {
+        await reloadFromSource();
+        updateTimestamp();
+      });
+
+      // Cerrar con Escape (accesibilidad)
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") { closePin(); closeAdmin(); }
+      });
+    }
+
+    /* Restaurar TODO al menú por defecto (con confirmación) */
+    function resetMenu() {
+      if (!confirm("¿Reiniciar el menú a los valores originales? Se restaurarán todos los estados.")) return;
+      state.menu = structuredClone(DEFAULT_MENU);
+      commitChange();
+    }
+
+    /* ===================== 10) INIT ===================== */
+    async function init() {
+      try {
+        state.menu = await fetchData(); // datos iniciales
+        render();
+      } catch (err) {
+        console.error("Error al cargar menú, reiniciando por defecto:", err);
+        localStorage.removeItem(CONFIG.storeKey);
+        state.menu = structuredClone(DEFAULT_MENU);
+        render();
+      }
+      updateTimestamp();
+      bindEvents();
+      setupSync();
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
